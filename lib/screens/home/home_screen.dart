@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:twitter/screens/compose/compose_tweet_screen.dart';
+import 'package:twitter/screens/search/search_screen.dart';
+import 'package:twitter/screens/notifications/notifications_screen.dart';
+import 'package:twitter/screens/messages/messages_screen.dart';
 import 'package:twitter/services/mock_data_service.dart';
 import 'package:twitter/widgets/tweet_card.dart';
 
@@ -14,6 +17,12 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
+  final List<Widget> _screens = [
+    const _HomeTab(),
+    const SearchScreen(),
+    const NotificationsScreen(),
+    const MessagesScreen(),
+  ];
 
   void _openComposeTweet() async {
     await Navigator.of(context).push(
@@ -30,37 +39,13 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Home'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.star_outline),
-            onPressed: () {},
-          ),
-        ],
-      ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          // In a real app, this would fetch new tweets
-          setState(() {});
-        },
-        child: ListView.builder(
-          itemCount: MockDataService.tweets.length,
-          itemBuilder: (context, index) {
-            final tweet = MockDataService.tweets[index];
-            return TweetCard(
-              tweet: tweet,
-              onTap: () {
-                // In a real app, this would navigate to tweet detail
-              },
-            );
-          },
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _openComposeTweet,
-        child: const Icon(Icons.edit),
-      ),
+      body: _screens[_selectedIndex],
+      floatingActionButton: _selectedIndex == 0
+          ? FloatingActionButton(
+              onPressed: _openComposeTweet,
+              child: const Icon(Icons.edit),
+            )
+          : null,
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
         onDestinationSelected: (index) {
@@ -89,6 +74,42 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'Messages',
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _HomeTab extends StatelessWidget {
+  const _HomeTab();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Home'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.star_outline),
+            onPressed: () {},
+          ),
+        ],
+      ),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          // In a real app, this would fetch new tweets
+        },
+        child: ListView.builder(
+          itemCount: MockDataService.tweets.length,
+          itemBuilder: (context, index) {
+            final tweet = MockDataService.tweets[index];
+            return TweetCard(
+              tweet: tweet,
+              onTap: () {
+                // In a real app, this would navigate to tweet detail
+              },
+            );
+          },
+        ),
       ),
     );
   }

@@ -99,7 +99,7 @@ class TweetCard extends StatelessWidget {
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
-                          color: Theme.of(context).colorScheme.surfaceVariant,
+                          color: Theme.of(context).colorScheme.surfaceContainerHighest,
                           child: const Center(
                             child: Icon(Icons.error_outline),
                           ),
@@ -108,7 +108,7 @@ class TweetCard extends StatelessWidget {
                       loadingBuilder: (context, child, loadingProgress) {
                         if (loadingProgress == null) return child;
                         return Container(
-                          color: Theme.of(context).colorScheme.surfaceVariant,
+                          color: Theme.of(context).colorScheme.surfaceContainerHighest,
                           child: const Center(
                             child: CircularProgressIndicator(),
                           ),
@@ -125,6 +125,7 @@ class TweetCard extends StatelessWidget {
                   _TweetActionButton(
                     icon: Icons.chat_bubble_outline,
                     count: tweet.replies,
+                    isActive: false,
                     onTap: () {},
                   ),
                   _TweetActionButton(
@@ -132,6 +133,7 @@ class TweetCard extends StatelessWidget {
                     count: tweet.retweets,
                     isActive: tweet.isRetweeted,
                     onTap: () => MockDataService.toggleRetweet(tweet.id),
+                    activeColor: Colors.green,
                   ),
                   _TweetActionButton(
                     icon: Icons.favorite_border,
@@ -143,6 +145,7 @@ class TweetCard extends StatelessWidget {
                   ),
                   _TweetActionButton(
                     icon: Icons.share_outlined,
+                    isActive: false,
                     onTap: () {},
                   ),
                 ],
@@ -167,7 +170,7 @@ class _TweetActionButton extends StatelessWidget {
     required this.icon,
     this.activeIcon,
     this.count,
-    this.isActive = false,
+    required this.isActive,
     this.activeColor,
     required this.onTap,
   });
@@ -187,16 +190,15 @@ class _TweetActionButton extends StatelessWidget {
               size: 18,
               color: isActive
                   ? (activeColor ?? Theme.of(context).colorScheme.primary)
-                  : null,
+                  : Theme.of(context).colorScheme.surfaceContainerHighest,
             ),
             if (count != null) ...[
               const SizedBox(width: 4),
               Text(
                 _formatCount(count!),
                 style: TextStyle(
-                  color: isActive
-                      ? (activeColor ?? Theme.of(context).colorScheme.primary)
-                      : null,
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  fontSize: 12,
                 ),
               ),
             ],
