@@ -73,4 +73,24 @@ class MockDataService {
       );
     }
   }
+
+  static void addTweet({
+    required String content,
+    required String username,
+    required String userHandle,
+    String? imageUrl,
+  }) {
+    final newTweet = Tweet(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      userId:
+          'current_user', // In a real app, this would be the authenticated user's ID
+      username: username,
+      userHandle: userHandle,
+      content: content,
+      timestamp: DateTime.now(),
+      imageUrl: imageUrl,
+    );
+
+    tweets.insert(0, newTweet);
+  }
 }
