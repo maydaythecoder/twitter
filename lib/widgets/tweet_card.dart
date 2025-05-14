@@ -7,12 +7,17 @@ class TweetCard extends StatelessWidget {
   final Tweet tweet;
   final VoidCallback? onTap;
 
-  const TweetCard({super.key, required this.tweet, this.onTap});
+  const TweetCard({
+    super.key,
+    required this.tweet,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
         child: Padding(
@@ -21,6 +26,7 @@ class TweetCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   CircleAvatar(
                     backgroundColor: Theme.of(context).colorScheme.primary,
@@ -36,17 +42,24 @@ class TweetCard extends StatelessWidget {
                       children: [
                         Row(
                           children: [
-                            Text(
-                              tweet.username,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
+                            Flexible(
+                              child: Text(
+                                tweet.username,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                             const SizedBox(width: 4),
-                            Text(
-                              '@${tweet.userHandle}',
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.secondary,
+                            Flexible(
+                              child: Text(
+                                '@${tweet.userHandle}',
+                                style: TextStyle(
+                                  color:
+                                      Theme.of(context).colorScheme.secondary,
+                                ),
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                             const SizedBox(width: 4),
@@ -64,20 +77,44 @@ class TweetCard extends StatelessWidget {
                   IconButton(
                     icon: const Icon(Icons.more_horiz),
                     onPressed: () {},
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    visualDensity: VisualDensity.compact,
                   ),
                 ],
               ),
               const SizedBox(height: 8),
-              Text(tweet.content),
+              Text(
+                tweet.content,
+                style: const TextStyle(height: 1.3),
+              ),
               if (tweet.imageUrl != null) ...[
                 const SizedBox(height: 8),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: Image.network(
-                    tweet.imageUrl!,
-                    height: 200,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
+                  child: AspectRatio(
+                    aspectRatio: 16 / 9,
+                    child: Image.network(
+                      tweet.imageUrl!,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: Theme.of(context).colorScheme.surfaceVariant,
+                          child: const Center(
+                            child: Icon(Icons.error_outline),
+                          ),
+                        );
+                      },
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Container(
+                          color: Theme.of(context).colorScheme.surfaceVariant,
+                          child: const Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 ),
               ],
@@ -104,7 +141,10 @@ class TweetCard extends StatelessWidget {
                     activeColor: Colors.red,
                     onTap: () => MockDataService.toggleLike(tweet.id),
                   ),
-                  _TweetActionButton(icon: Icons.share_outlined, onTap: () {}),
+                  _TweetActionButton(
+                    icon: Icons.share_outlined,
+                    onTap: () {},
+                  ),
                 ],
               ),
             ],
@@ -140,25 +180,23 @@ class _TweetActionButton extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         child: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               isActive ? (activeIcon ?? icon) : icon,
               size: 18,
-              color:
-                  isActive
-                      ? (activeColor ?? Theme.of(context).colorScheme.primary)
-                      : null,
+              color: isActive
+                  ? (activeColor ?? Theme.of(context).colorScheme.primary)
+                  : null,
             ),
             if (count != null) ...[
               const SizedBox(width: 4),
               Text(
-                count.toString(),
+                _formatCount(count!),
                 style: TextStyle(
-                  color:
-                      isActive
-                          ? (activeColor ??
-                              Theme.of(context).colorScheme.primary)
-                          : null,
+                  color: isActive
+                      ? (activeColor ?? Theme.of(context).colorScheme.primary)
+                      : null,
                 ),
               ),
             ],
@@ -166,5 +204,14 @@ class _TweetActionButton extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _formatCount(int count) {
+    if (count >= 1000000) {
+      return '${(count / 1000000).toStringAsFixed(1)}M';
+    } else if (count >= 1000) {
+      return '${(count / 1000).toStringAsFixed(1)}K';
+    }
+    return count.toString();
   }
 }
