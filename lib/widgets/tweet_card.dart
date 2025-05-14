@@ -3,7 +3,7 @@ import 'package:twitter/models/tweet.dart';
 import 'package:twitter/services/mock_data_service.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-class TweetCard extends StatelessWidget {
+class TweetCard extends StatefulWidget {
   final Tweet tweet;
   final VoidCallback? onTap;
 
@@ -14,12 +14,39 @@ class TweetCard extends StatelessWidget {
   });
 
   @override
+  State<TweetCard> createState() => _TweetCardState();
+}
+
+class _TweetCardState extends State<TweetCard> {
+  late Tweet _tweet;
+
+  @override
+  void initState() {
+    super.initState();
+    _tweet = widget.tweet;
+  }
+
+  void _toggleLike() {
+    setState(() {
+      MockDataService.toggleLike(_tweet.id);
+      _tweet = MockDataService.getTweetById(_tweet.id)!;
+    });
+  }
+
+  void _toggleRetweet() {
+    setState(() {
+      MockDataService.toggleRetweet(_tweet.id);
+      _tweet = MockDataService.getTweetById(_tweet.id)!;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: onTap,
+        onTap: widget.onTap,
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: Column(
@@ -31,7 +58,7 @@ class TweetCard extends StatelessWidget {
                   CircleAvatar(
                     backgroundColor: Theme.of(context).colorScheme.primary,
                     child: Text(
-                      tweet.username[0].toUpperCase(),
+                      _tweet.username[0].toUpperCase(),
                       style: const TextStyle(color: Colors.white),
                     ),
                   ),
@@ -44,7 +71,7 @@ class TweetCard extends StatelessWidget {
                           children: [
                             Expanded(
                               child: Text(
-                                tweet.username,
+                                _tweet.username,
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -54,7 +81,7 @@ class TweetCard extends StatelessWidget {
                             const SizedBox(width: 4),
                             Expanded(
                               child: Text(
-                                '@${tweet.userHandle}',
+                                '@${_tweet.userHandle}',
                                 style: TextStyle(
                                   color:
                                       Theme.of(context).colorScheme.secondary,
@@ -64,7 +91,7 @@ class TweetCard extends StatelessWidget {
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              '· ${timeago.format(tweet.timestamp)}',
+                              '· ${timeago.format(_tweet.timestamp)}',
                               style: TextStyle(
                                 color: Theme.of(context).colorScheme.secondary,
                               ),
@@ -87,17 +114,17 @@ class TweetCard extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                tweet.content,
+                _tweet.content,
                 style: const TextStyle(height: 1.3),
               ),
-              if (tweet.imageUrl != null) ...[
+              if (_tweet.imageUrl != null) ...[
                 const SizedBox(height: 8),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
                   child: AspectRatio(
                     aspectRatio: 16 / 9,
                     child: Image.network(
-                      tweet.imageUrl!,
+                      _tweet.imageUrl!,
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
@@ -135,29 +162,33 @@ class TweetCard extends StatelessWidget {
                 children: [
                   _TweetActionButton(
                     icon: Icons.chat_bubble_outline,
-                    count: tweet.replies,
+                    count: _tweet.replies,
                     isActive: false,
                     onTap: () {},
+                    inactiveColor: Colors.grey,
                   ),
                   _TweetActionButton(
                     icon: Icons.repeat,
-                    count: tweet.retweets,
-                    isActive: tweet.isRetweeted,
-                    onTap: () => MockDataService.toggleRetweet(tweet.id),
+                    count: _tweet.retweets,
+                    isActive: _tweet.isRetweeted,
+                    onTap: _toggleRetweet,
                     activeColor: Colors.green,
+                    inactiveColor: Colors.grey[700],
                   ),
                   _TweetActionButton(
                     icon: Icons.favorite_border,
                     activeIcon: Icons.favorite,
-                    count: tweet.likes,
-                    isActive: tweet.isLiked,
+                    count: _tweet.likes,
+                    isActive: _tweet.isLiked,
                     activeColor: Colors.red,
-                    onTap: () => MockDataService.toggleLike(tweet.id),
+                    onTap: _toggleLike,
+                    inactiveColor: Colors.grey[700],
                   ),
                   _TweetActionButton(
                     icon: Icons.share_outlined,
                     isActive: false,
                     onTap: () {},
+                    inactiveColor: Colors.grey[700],
                   ),
                 ],
               ),
@@ -175,6 +206,7 @@ class _TweetActionButton extends StatelessWidget {
   final int? count;
   final bool isActive;
   final Color? activeColor;
+  final Color? inactiveColor;
   final VoidCallback onTap;
 
   const _TweetActionButton({
@@ -183,11 +215,15 @@ class _TweetActionButton extends StatelessWidget {
     this.count,
     required this.isActive,
     this.activeColor,
+    this.inactiveColor,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    final Color iconColor = isActive
+        ? (activeColor ?? Theme.of(context).colorScheme.primary)
+        : (inactiveColor ?? Colors.grey[700]!);
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(20),
@@ -199,16 +235,14 @@ class _TweetActionButton extends StatelessWidget {
             Icon(
               isActive ? (activeIcon ?? icon) : icon,
               size: 18,
-              color: isActive
-                  ? (activeColor ?? Theme.of(context).colorScheme.primary)
-                  : Theme.of(context).colorScheme.surfaceContainerHighest,
+              color: iconColor,
             ),
             if (count != null) ...[
               const SizedBox(width: 4),
               Text(
                 _formatCount(count!),
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  color: iconColor,
                   fontSize: 12,
                 ),
               ),
