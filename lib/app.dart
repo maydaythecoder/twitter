@@ -1,24 +1,41 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:twitter/config/theme.dart';
-import 'package:twitter/screens/home/home_screen.dart';
-import 'package:twitter/services/settings_service.dart';
+import 'services/firebase_service.dart';
+import 'screens/auth/login_screen.dart';
+import 'screens/auth/register_screen.dart';
+import 'screens/home/tweet_list_screen.dart';
 
 class TwitterApp extends StatelessWidget {
   const TwitterApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => SettingsService(),
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Twitter Clone',
-        theme: AppTheme.lightTheme,
-        darkTheme: AppTheme.darkTheme,
-        themeMode: ThemeMode.system,
-        home: const HomeScreen(title: 'Twitter Clone'),
+    final firebaseService = FirebaseService();
+
+    return MaterialApp(
+      title: 'Twitter Clone',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        useMaterial3: true,
       ),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => StreamBuilder(
+              stream: firebaseService.authStateChanges,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (snapshot.hasData) {
+                  return const TweetListScreen();
+                }
+
+                return const LoginScreen();
+              },
+            ),
+        '/login': (context) => const LoginScreen(),
+        '/register': (context) => const RegisterScreen(),
+      },
     );
   }
 }

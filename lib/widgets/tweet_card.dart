@@ -81,7 +81,7 @@ class _TweetCardState extends State<TweetCard> {
                             const SizedBox(width: 4),
                             Expanded(
                               child: Text(
-                                '@${_tweet.userHandle}',
+                                '@${_tweet.username}',
                                 style: TextStyle(
                                   color:
                                       Theme.of(context).colorScheme.secondary,
@@ -91,7 +91,7 @@ class _TweetCardState extends State<TweetCard> {
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              '· ${timeago.format(_tweet.timestamp)}',
+                              '· ${timeago.format(_tweet.createdAt)}',
                               style: TextStyle(
                                 color: Theme.of(context).colorScheme.secondary,
                               ),
@@ -162,7 +162,6 @@ class _TweetCardState extends State<TweetCard> {
                 children: [
                   _TweetActionButton(
                     icon: Icons.chat_bubble_outline,
-                    count: _tweet.replies,
                     isActive: false,
                     onTap: () {},
                     inactiveColor: Colors.grey,
@@ -170,16 +169,16 @@ class _TweetCardState extends State<TweetCard> {
                   _TweetActionButton(
                     icon: Icons.repeat,
                     count: _tweet.retweets,
-                    isActive: _tweet.isRetweeted,
                     onTap: _toggleRetweet,
                     activeColor: Colors.green,
+                    isActive: _tweet.retweets > 0,
                     inactiveColor: Colors.grey[700],
                   ),
                   _TweetActionButton(
                     icon: Icons.favorite_border,
                     activeIcon: Icons.favorite,
                     count: _tweet.likes,
-                    isActive: _tweet.isLiked,
+                    isActive: _tweet.likedBy.contains('current_user'),
                     activeColor: Colors.red,
                     onTap: _toggleLike,
                     inactiveColor: Colors.grey[700],

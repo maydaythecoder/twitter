@@ -13,23 +13,20 @@ class _MessagesScreenState extends State<MessagesScreen> {
   final List<Map<String, dynamic>> _conversations = [
     {
       'username': 'Elon Musk',
-      'userHandle': 'elonmusk',
       'lastMessage': 'Hey, what do you think about the new AI developments?',
-      'timestamp': DateTime.now().subtract(const Duration(minutes: 5)),
+      'createdAt': DateTime.now().subtract(const Duration(minutes: 5)),
       'unread': true,
     },
     {
       'username': 'Flutter Dev',
-      'userHandle': 'flutterdev',
       'lastMessage': 'Thanks for the feedback on the app!',
-      'timestamp': DateTime.now().subtract(const Duration(hours: 2)),
+      'createdAt': DateTime.now().subtract(const Duration(hours: 2)),
       'unread': false,
     },
     {
       'username': 'Tech News',
-      'userHandle': 'technews',
       'lastMessage': 'Would you like to be featured in our next article?',
-      'timestamp': DateTime.now().subtract(const Duration(days: 1)),
+      'createdAt': DateTime.now().subtract(const Duration(days: 1)),
       'unread': false,
     },
   ];
@@ -82,7 +79,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                   ),
                 ),
                 Text(
-                  timeago.format(conversation['timestamp']),
+                  timeago.format(conversation['createdAt']),
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.secondary,
                     fontSize: 12,

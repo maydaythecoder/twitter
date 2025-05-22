@@ -41,7 +41,7 @@ class _SearchScreenState extends State<SearchScreen>
     final tweets = MockDataService.tweets.where((tweet) {
       final content = tweet.content.toLowerCase();
       final username = tweet.username.toLowerCase();
-      final handle = tweet.userHandle.toLowerCase();
+      final handle = tweet.username.toLowerCase();
       final query = _searchQuery.toLowerCase();
 
       return content.contains(query) ||

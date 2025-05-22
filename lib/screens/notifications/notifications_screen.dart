@@ -14,24 +14,21 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     {
       'type': 'like',
       'username': 'Elon Musk',
-      'userHandle': 'elonmusk',
       'tweetContent':
           '🚀 Excited about the future of AI and sustainable energy!',
-      'timestamp': DateTime.now().subtract(const Duration(minutes: 5)),
+      'createdAt': DateTime.now().subtract(const Duration(minutes: 5)),
     },
     {
       'type': 'retweet',
       'username': 'Flutter Dev',
-      'userHandle': 'flutterdev',
       'tweetContent': 'Just built an amazing app with Flutter!',
-      'timestamp': DateTime.now().subtract(const Duration(hours: 1)),
+      'createdAt': DateTime.now().subtract(const Duration(hours: 1)),
     },
     {
       'type': 'mention',
       'username': 'Tech News',
-      'userHandle': 'technews',
       'tweetContent': '@currentuser Check out this amazing tech!',
-      'timestamp': DateTime.now().subtract(const Duration(hours: 2)),
+      'createdAt': DateTime.now().subtract(const Duration(hours: 2)),
     },
   ];
 
@@ -104,7 +101,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  timeago.format(notification['timestamp']),
+                  timeago.format(notification['createdAt']),
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.secondary,
                     fontSize: 12,

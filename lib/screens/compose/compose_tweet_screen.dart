@@ -53,7 +53,6 @@ class _ComposeTweetScreenState extends State<ComposeTweetScreen> {
       MockDataService.addTweet(
         content: _textController.text.trim(),
         username: 'Current User', // In a real app, this would come from auth
-        userHandle: 'currentuser',
       );
 
       if (mounted) {
